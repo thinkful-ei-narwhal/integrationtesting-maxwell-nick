@@ -45,8 +45,13 @@ app.get('/movie', (req, res) => {
   const avg_vote = req.query.avg_vote;
   let returnData = [...data];
 
-
   if (genre) {
+
+    const genres = data.map(element => element.genre);
+    if (!genres.includes(genre)) {
+      res.status(400).json({ error: 'Genre does not exist' });
+    }
+
     let genreLC = genre.toLowerCase();
     returnData = returnData.filter(data => data.genre.toLowerCase().includes(genreLC));
   }
