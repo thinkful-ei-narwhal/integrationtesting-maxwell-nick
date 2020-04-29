@@ -2,7 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
-const data = require('./movies-data-small.json');
+const data = require('../movies-data-small.json');
 require('dotenv').config();
 
 const app = express();
@@ -15,8 +15,6 @@ const API_TOKEN = process.env.API_TOKEN;
 
 function requireAuth(req, res, next) {
   const authValue = req.get('Authorization') || ' ';
-
-
 
   //verify bearer
   if (!authValue.toLowerCase().startsWith('bearer')) {
@@ -53,14 +51,14 @@ app.get('/movie', (req, res) => {
     returnData = returnData.filter(data => data.genre.toLowerCase().includes(genreLC));
   }
 
-  if(country) {
+  if (country) {
     let countryLC = country.toLowerCase();
-    returnData = returnData.filter(data => data.country.toLowerCase().includes(countryLC) )
+    returnData = returnData.filter(data => data.country.toLowerCase().includes(countryLC));
   }
-  
-  if(avg_vote) {
-    returnData = returnData.filter(data => data.avg_vote >= avg_vote)
-    returnData = returnData.sort((a, b) => { return a.avg_vote - b.avg_vote })
+
+  if (avg_vote) {
+    returnData = returnData.filter(data => data.avg_vote >= avg_vote);
+    returnData = returnData.sort((a, b) => { return a.avg_vote - b.avg_vote; });
   }
 
   // When searching by country, users are searching for whether the Movie's country includes a specified string. The search should be case insensitive.
@@ -71,4 +69,5 @@ app.get('/movie', (req, res) => {
   res.status(200).json(returnData);
 });
 
-app.listen(9000, () => console.log('Server listening at http://localhost:9000'));
+
+module.exports = { app: app };
