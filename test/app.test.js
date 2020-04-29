@@ -4,17 +4,26 @@ const { expect } = require('chai');
 const supertest = require('supertest');
 
 describe('App Test Suite', () => {
-  it('App Move Genre', () => {
-    const testGenre = 'Thriller';
+  function compareFx(res, compare) {
+    res.body.forEach(element => {
+      if(element.genre !== compare){
+        return false; 
+      };
+    });
+    return true;
+  }
 
-    function test(res) {
-      if (res.body.forEach(element => { element.genre === testGenre; })) {
-        return true;
+  function checkRating(response, testRating){
+    response.body.map(movie => {
+      if(movie.rating < testRating){
+        return false;
       }
-      else {
-        return true;
-      }
-    }
+    });
+    return true;
+  }
+
+  it('App Movie Genre', () => {
+    const testGenre = 'Thriller';
 
     return supertest(app).get('/movie')
       .set('Authorization', 'Bearer ' + process.env.API_TOKEN)
@@ -23,7 +32,33 @@ describe('App Test Suite', () => {
       .expect('Content-Type', /json/)
       .then(res => {
         expect(res.body).to.be.an('array');
-        expect(test(res)).to.be.true;
+        expect(compareFx(res, testGenre)).to.be.true;
       });
+  });
+
+  it('App Country of Movie', () => {
+    const testCountry = 'Italy';
+    return supertest(app).get('/movie')
+    .set('Authorization', 'Bearer ' + process.env.API_TOKEN)
+    .query({country: testCountry})
+    .expect(200)
+    .expect('Content-Type', /json/)
+    .then(response => {
+      expect(response.body).to.be.an('array');
+      expect(compareFx(response, testCountry)).to.be.true;
+    });
+  });
+
+  it('Rating of Movie', () => {
+    let testRating = 9;
+    return supertest(app).get('/movie')
+    .set('Authorization', 'Bearer ' + process.env.API_TOKEN)
+    .query({avg_vote: testRating})
+    .expect(200)
+    .expect('Content-Type', /json/)
+    .then(response => {
+      expect(response.body).to.be.an('array');
+      expect(checkRating(response, testRating)).to.be.true;
+    });
   });
 });
